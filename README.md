@@ -15,6 +15,13 @@ Features
 - Searches a fixed depth of four ply.
 - A simple console (ASCII) user interface.
 
+Documentation
+=============
+
+The source code has comments in most places.  Otherwise, the best place for a high level description is the
+above link.
+Additionally, the directory doc contains some additional information on writing chess engines.
+
 
 TODO
 ====

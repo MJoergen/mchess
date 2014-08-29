@@ -11,7 +11,7 @@
  ***************************************************************/
 int main()
 {
-    srand(time(0));
+    srand(time(0)); // Seed the random number generator.
 
     CBoard board;
     AI ai(board);
@@ -65,7 +65,7 @@ int main()
             }
         } // end of "move "
 
-        if (str.compare(0, 2, "go") == 0)
+        else if (str.compare(0, 2, "go") == 0)
         {
             CMove best_move = ai.find_best_move();
 
@@ -74,12 +74,19 @@ int main()
             board.make_move(best_move);
         } // end of "go"
 
-        if (str == "show")
+        else if (str == "show")
         {
             CMoveList moves;
             board.find_legal_moves(moves);
 
-            std::cout << moves.ToShortString() << std::endl;
+            //            std::cout << moves.ToShortString() << std::endl;
+            std::cout << moves << std::endl;
+        }
+
+        else 
+        {
+            std::cout << "Unknown command" << std::endl;
+            std::cout << "Valid commands are: quit, move, go, show" << std::endl;
         }
     } // end of while (true)
 

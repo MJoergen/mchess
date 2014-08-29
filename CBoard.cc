@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "CBoard.h"
 
 // Create nice colours in the console output
@@ -801,7 +802,6 @@ void CBoard::undo_move(const CMove &move)
 bool CBoard::IsMoveValid(CMove &move)
 {
     CMoveList moves;
-    moves.reserve(999);
     find_legal_moves(moves);
     for (unsigned int i=0; i<moves.size(); ++i)
     {
@@ -820,11 +820,23 @@ bool CBoard::IsMoveValid(CMove &move)
  *
  * It returns an integer value showing how good the position
  * is for the side to move.
+ *
+ * This is a very simple evaluation function. Only two factors are
+ * considered:
+ * 1. The material balance:
+ *      * Pawn   100
+ *      * Knight 300
+ *      * Bishop 300
+ *      * Rook   500
+ *      * Queen  900
+ * 2. The difference in number of legal moves of both players.
+ *
+ * The latter tends to favor positions, where the computer
+ * has many legal moves. This implies centralization and development.
  ***************************************************************/
 int CBoard::get_value()
 {
     CMoveList moves;
-    moves.reserve(999);
     find_legal_moves(moves);
     int my_moves = moves.size();
     swap_sides();
@@ -833,7 +845,7 @@ int CBoard::get_value()
     int his_moves = moves.size();
     swap_sides();
 
-    return (his_moves-my_moves) - 100*m_material;
+    return (my_moves-his_moves) + 100*m_material;
 } // end of int CBoard::get_value()
 
 /***************************************************************

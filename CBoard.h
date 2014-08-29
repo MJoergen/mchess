@@ -44,7 +44,9 @@
 enum // Directions
 {
     N = 10, S = -10, E = -1, W = 1,
-    NW = 11, SW = -9, NE = 9, SE = -11
+    NW = 11, SW = -9, NE = 9, SE = -11,
+    NNW = 21, NNE = 19, NWW = 12, NEE = 8,
+    SSW = -19, SSE = -21, SWW = -8, SEE = -12
 };
 
 /***************************************************************
@@ -63,7 +65,7 @@ class CBoard
         void make_move(const CMove &move);
         void undo_move(const CMove &move);
         int  get_value();
-        bool IsMoveValid(CMove &move);
+        bool IsMoveValid(CMove &move) const;
         bool isKingInCheck() const;
         bool isOtherKingInCheck() const; // Used by perft
 

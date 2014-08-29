@@ -58,23 +58,23 @@ std::ostream& operator <<(std::ostream &os, const CBoard &rhs)
 void CBoard::newGame()
 {
     e_piece initial[120] = {
-      IV, IV, IV, IV, IV, IV, IV, IV, IV, IV,
-      IV, IV, IV, IV, IV, IV, IV, IV, IV, IV,
-      IV, WR, WN, WB, WQ, WK, WB, WN, WR, IV,
-      IV, WP, WP, WP, WP, WP, WP, WP, WP, IV,
-      IV, EM, EM, EM, EM, EM, EM, EM, EM, IV,
-      IV, EM, EM, EM, EM, EM, EM, EM, EM, IV,
-      IV, EM, EM, EM, EM, EM, EM, EM, EM, IV,
-      IV, EM, EM, EM, EM, EM, EM, EM, EM, IV,
-      IV, BP, BP, BP, BP, BP, BP, BP, BP, IV,
-      IV, BR, BN, BB, BQ, BK, BB, BN, BR, IV,
-      IV, IV, IV, IV, IV, IV, IV, IV, IV, IV,
-      IV, IV, IV, IV, IV, IV, IV, IV, IV, IV} ;
+        IV, IV, IV, IV, IV, IV, IV, IV, IV, IV,
+        IV, IV, IV, IV, IV, IV, IV, IV, IV, IV,
+        IV, WR, WN, WB, WQ, WK, WB, WN, WR, IV,
+        IV, WP, WP, WP, WP, WP, WP, WP, WP, IV,
+        IV, EM, EM, EM, EM, EM, EM, EM, EM, IV,
+        IV, EM, EM, EM, EM, EM, EM, EM, EM, IV,
+        IV, EM, EM, EM, EM, EM, EM, EM, EM, IV,
+        IV, EM, EM, EM, EM, EM, EM, EM, EM, IV,
+        IV, BP, BP, BP, BP, BP, BP, BP, BP, IV,
+        IV, BR, BN, BB, BQ, BK, BB, BN, BR, IV,
+        IV, IV, IV, IV, IV, IV, IV, IV, IV, IV,
+        IV, IV, IV, IV, IV, IV, IV, IV, IV, IV} ;
 
     m_board.reserve(120);
     for (int i=0; i<120; ++i)
     {
-      m_board[i] = initial[i];
+        m_board[i] = initial[i];
     }
 
     m_side_to_move = 1;
@@ -95,7 +95,7 @@ bool CBoard::isSquareThreatened(const CSquare& sq) const
 
         // Check for knigts
         {
-            int dirs[8] = {21, 19, 12, 8, -21, -19, -12, -8};
+            int dirs[8] = {NNW, NNE, NWW, NEE, SSW, SSE, SWW, SEE};
 
             for (int k=0; k<8; ++k)
             {
@@ -165,7 +165,7 @@ bool CBoard::isSquareThreatened(const CSquare& sq) const
 
         // Check for knigts
         {
-            int dirs[8] = {21, 19, 12, 8, -21, -19, -12, -8};
+            int dirs[8] = {NNW, NNE, NWW, NEE, SSW, SSE, SWW, SEE};
 
             for (int k=0; k<8; ++k)
             {
@@ -350,7 +350,7 @@ void CBoard::find_legal_moves(CMoveList &moves) const
 
                 case WN : // White knight 
                     {
-                        int dirs[8] = {21, 19, 12, 8, -21, -19, -12, -8};
+                        int dirs[8] = {NNW, NNE, NWW, NEE, SSW, SSE, SWW, SEE};
 
                         for (int k=0; k<8; ++k)
                         {
@@ -370,7 +370,7 @@ void CBoard::find_legal_moves(CMoveList &moves) const
 
                 case WB : // White bishop
                     {
-                        int dirs[4] = {11, 9, -11, -9};
+                        int dirs[4] = {NE, NW, SE, SW};
 
                         for (int k=0; k<4; ++k)
                         {
@@ -397,7 +397,7 @@ void CBoard::find_legal_moves(CMoveList &moves) const
 
                 case WR : // White rook
                     {
-                        int dirs[4] = {10, 1, -1, -10};
+                        int dirs[4] = {N, E, S, W};
 
                         for (int k=0; k<4; ++k)
                         {
@@ -424,7 +424,7 @@ void CBoard::find_legal_moves(CMoveList &moves) const
 
                 case WQ : // White queen
                     {
-                        int dirs[8] = {11, 9, -11, -9, 10, 1, -1, -10};
+                        int dirs[8] = {NE, NW, SE, SW, N, E, S, W};
 
                         for (int k=0; k<8; ++k)
                         {
@@ -451,7 +451,7 @@ void CBoard::find_legal_moves(CMoveList &moves) const
 
                 case WK : // White king
                     {
-                        int dirs[8] = {9, 10, 11, 1, -1, -9, -10, -11};
+                        int dirs[8] = {NE, NW, SE, SW, N, E, S, W};
 
                         for (int k=0; k<8; ++k)
                         {
@@ -585,7 +585,7 @@ void CBoard::find_legal_moves(CMoveList &moves) const
 
                 case BN : // Black knight
                     {
-                        int dirs[8] = {21, 19, 12, 8, -21, -19, -12, -8};
+                        int dirs[8] = {NNW, NNE, NWW, NEE, SSW, SSE, SWW, SEE};
 
                         for (int k=0; k<8; ++k)
                         {
@@ -605,7 +605,7 @@ void CBoard::find_legal_moves(CMoveList &moves) const
 
                 case BB : // Black bishop
                     {
-                        int dirs[4] = {11, 9, -11, -9};
+                        int dirs[4] = {NE, NW, SE, SW};
 
                         for (int k=0; k<4; ++k)
                         {
@@ -632,7 +632,7 @@ void CBoard::find_legal_moves(CMoveList &moves) const
 
                 case BR : // Black rook
                     {
-                        int dirs[4] = {10, 1, -1, -10};
+                        int dirs[4] = {N, E, S, W};
 
                         for (int k=0; k<4; ++k)
                         {
@@ -659,7 +659,7 @@ void CBoard::find_legal_moves(CMoveList &moves) const
 
                 case BQ : // Black queen
                     {
-                        int dirs[8] = {11, 9, -11, -9, 10, 1, -1, -10};
+                        int dirs[8] = {NE, NW, SE, SW, N, E, S, W};
 
                         for (int k=0; k<8; ++k)
                         {
@@ -686,7 +686,7 @@ void CBoard::find_legal_moves(CMoveList &moves) const
 
                 case BK : // Black king
                     {
-                        int dirs[8] = {9, 10, 11, 1, -1, -9, -10, -11};
+                        int dirs[8] = {NE, NW, SE, SW, N, E, S, W};
 
                         for (int k=0; k<8; ++k)
                         {
@@ -712,6 +712,7 @@ void CBoard::find_legal_moves(CMoveList &moves) const
         }
 } // end of void CBoard::find_legal_moves(CMoveList &moves) const;
 
+
 /***************************************************************
  * make_move
  * This updates the board according to the move
@@ -720,29 +721,20 @@ void CBoard::make_move(const CMove &move)
 {
     switch (move.m_captured)
     {
-        case WP : m_material += 1; break;
-        case WN : m_material += 3; break;
-        case WB : m_material += 3; break;
-        case WR : m_material += 5; break;
-        case WQ : m_material += 9; break;
-        case BP : m_material += 1; break;
-        case BN : m_material += 3; break;
-        case BB : m_material += 3; break;
-        case BR : m_material += 5; break;
-        case BQ : m_material += 9; break;
+        case WP : case BP : m_material += 1; break;
+        case WN : case BN : m_material += 3; break;
+        case WB : case BB : m_material += 3; break;
+        case WR : case BR : m_material += 5; break;
+        case WQ : case BQ : m_material += 9; break;
         default : break;
     }
 
     switch (move.m_promoted)
     {
-        case WN : m_material += 3-1; break;
-        case WB : m_material += 3-1; break;
-        case WR : m_material += 5-1; break;
-        case WQ : m_material += 9-1; break;
-        case BN : m_material += 3-1; break;
-        case BB : m_material += 3-1; break;
-        case BR : m_material += 5-1; break;
-        case BQ : m_material += 9-1; break;
+        case WN : case BN : m_material += 3-1; break;
+        case WB : case BB : m_material += 3-1; break;
+        case WR : case BR : m_material += 5-1; break;
+        case WQ : case BQ : m_material += 9-1; break;
         default : break;
     }
 
@@ -754,38 +746,30 @@ void CBoard::make_move(const CMove &move)
     m_material = -m_material;
 } // end of void CBoard::make_move(const CMove &move)
 
+
 /***************************************************************
  * undo_move
- * This reverses the effect og make_move
+ * This reverses the effect of make_move
  ***************************************************************/
 void CBoard::undo_move(const CMove &move)
 {
     m_material = -m_material;
     switch (move.m_captured)
     {
-        case WP : m_material -= 1; break;
-        case WN : m_material -= 3; break;
-        case WB : m_material -= 3; break;
-        case WR : m_material -= 5; break;
-        case WQ : m_material -= 9; break;
-        case BP : m_material -= 1; break;
-        case BN : m_material -= 3; break;
-        case BB : m_material -= 3; break;
-        case BR : m_material -= 5; break;
-        case BQ : m_material -= 9; break;
+        case WP : case BP : m_material -= 1; break;
+        case WN : case BN : m_material -= 3; break;
+        case WB : case BB : m_material -= 3; break;
+        case WR : case BR : m_material -= 5; break;
+        case WQ : case BQ : m_material -= 9; break;
         default : break;
     }
 
     switch (move.m_promoted)
     {
-        case WN : m_material -= 3-1; break;
-        case WB : m_material -= 3-1; break;
-        case WR : m_material -= 5-1; break;
-        case WQ : m_material -= 9-1; break;
-        case BN : m_material -= 3-1; break;
-        case BB : m_material -= 3-1; break;
-        case BR : m_material -= 5-1; break;
-        case BQ : m_material -= 9-1; break;
+        case WN : case BN : m_material -= 3-1; break;
+        case WB : case BB : m_material -= 3-1; break;
+        case WR : case BR : m_material -= 5-1; break;
+        case WQ : case BQ : m_material -= 9-1; break;
         default : break;
     }
 
@@ -795,11 +779,12 @@ void CBoard::undo_move(const CMove &move)
 
 } // end of void CBoard::undo_move(const CMove &move)
 
+
 /***************************************************************
  * IsMoveValid
  * This returns true, if the move is legal.
  ***************************************************************/
-bool CBoard::IsMoveValid(CMove &move)
+bool CBoard::IsMoveValid(CMove &move) const
 {
     CMoveList moves;
     find_legal_moves(moves);
@@ -814,6 +799,7 @@ bool CBoard::IsMoveValid(CMove &move)
     }
     return false;
 } // end of bool CBoard::IsMoveValid(CMove &move)
+
 
 /***************************************************************
  * get_value
@@ -848,6 +834,7 @@ int CBoard::get_value()
     return (my_moves-his_moves) + 100*m_material;
 } // end of int CBoard::get_value()
 
+
 /***************************************************************
  * Returns true if player to move is in check.
  ***************************************************************/
@@ -877,6 +864,7 @@ bool CBoard::isKingInCheck() const
 
 } // end of isKingInCheck
 
+
 /***************************************************************
  * Returns true if player NOT to move is in check.
  ***************************************************************/
@@ -887,20 +875,4 @@ bool CBoard::isOtherKingInCheck() const
     ((CBoard *)this)->m_side_to_move = -m_side_to_move;
     return retval;
 } // end of isOtherKingInCheck
-
-/***************************************************************
- ***************************************************************/
-CBoard::CBoard(const CBoard& rhs)
-{
-    m_side_to_move    = rhs.m_side_to_move;
-    m_material        = rhs.m_material;
-
-    m_board.clear();
-    m_board.reserve(120);
-    for (int i=0; i<120; ++i)
-    {
-        m_board[i] = rhs.m_board[i];
-    }
-
-} // end of copy constructor
 

@@ -67,7 +67,7 @@ class CBoard
         int  get_value();
         bool IsMoveValid(CMove &move) const;
         bool isKingInCheck() const;
-        bool isOtherKingInCheck() const; // Used by perft
+        bool isOtherKingInCheck() const;
 
         friend std::ostream& operator <<(std::ostream &os, const CBoard &rhs);
 

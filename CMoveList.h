@@ -1,6 +1,7 @@
 #ifndef _C_MOVELIST_H_
 #define _C_MOVELIST_H_
 
+#include <iostream>
 #include <vector>
 
 #include "CMove.h"

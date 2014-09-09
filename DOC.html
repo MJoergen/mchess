@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>mchess design documentation</title>
+<style>
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 5px;
+    text-align: right;
+}
+</style>
+</head>
+
+<body>
+This document is a description of the design of <em>mchess</em> and
+<em>mchess2</em>
+
+<h1>Piece representation</h1>
+The chess board consists of 64 squares. Each square may be empty or contain a
+white or black piece.  Each piece is given an integer value (this is not
+related to the <em>worth</em> of the piece in number of pawns).
+<p/>
+This enumeration is called <em>e_piece</em> and is defined in the file
+<em>CMove.h</em>:
+
+<pre>
+typedef enum {
+    EM = 0,   // Empty
+    WP = 1,   // White Pawn
+    WN = 2,   // White Knight
+    WB = 3,   // White Bishop
+    WR = 4,   // White Rook
+    WQ = 5,   // White Queen
+    WK = 6,   // White King
+    BP = -1,  // Black Pawn
+    BN = -2,  // Black Knight
+    BB = -3,  // Black Bishop
+    BR = -4,  // Black Rook
+    BQ = -5,  // Black Queen
+    BK = -6,  // Black King
+    IV = 99   // INVALID
+} e_piece;
+</pre>
+
+The above is merely an enumeration, and the actual numerical values are
+arbitrary. However, I do in the following rely on the fact that:
+<ul>
+    <li>The empty space has value zero</li>
+    <li>All white pieces have positive values</li>
+    <li>All black pieces have negative values</li>
+</ul>
+<p/>
+Additionally, I have a special value for an <em>invalid</em> piece. This has
+several uses, the foremost will be explained in the following.
+
+<h1>Square representation</h1>
+An important function in a chess engine is to be able to generate a list of all
+legal moves in a given position. This function is used all the time, and
+therefore must be as fast as possible.
+<p/>
+When writing such a function, one must first consider how to represent the
+board configuration, i.e. where each piece is placed, or equivalently, which
+piece is on a given square.
+<p/>
+I've chosen to represent the board as a simple
+one-dimensional array of integers. Each index in the array corresponds to a
+particular square, and each value in the array is the corresponding piece,
+according to the enumeration above.
+<p/>
+When generating a list of legal moves, it is necessary to check if a piece is
+about to move outside the edge of the board. For instance, a rook on H1 can not
+move to the right.
+<p/>
+This is dealt with in a very smart way: The board is <em>enlarged</em>, so that
+it is surrounded by two layers of invalid squares. This gives a total of 12
+rows of ten squares each, i.e. 120 elements in the array.
+
+<table>
+    <tr>
+        <td>110</td>
+        <td>111</td>
+        <td>112</td>
+        <td>113</td>
+        <td>114</td>
+        <td>115</td>
+        <td>116</td>
+        <td>117</td>
+        <td>118</td>
+        <td>119</td>
+    </tr>
+    <tr>
+        <td>100</td>
+        <td>101</td>
+        <td>102</td>
+        <td>103</td>
+        <td>104</td>
+        <td>105</td>
+        <td>106</td>
+        <td>107</td>
+        <td>108</td>
+        <td>109</td>
+    </tr>
+    <tr>
+        <td>90</td>
+        <td><b>A8</b></td>
+        <td><b>B8</b></td>
+        <td><b>C8</b></td>
+        <td><b>D8</b></td>
+        <td><b>E8</b></td>
+        <td><b>F8</b></td>
+        <td><b>G8</b></td>
+        <td><b>H8</b></td>
+        <td>99</td>
+    </tr>
+    <tr>
+        <td>80</td>
+        <td><b>A7</b></td>
+        <td><b>B7</b></td>
+        <td><b>C7</b></td>
+        <td><b>D7</b></td>
+        <td><b>E7</b></td>
+        <td><b>F7</b></td>
+        <td><b>G7</b></td>
+        <td><b>H7</b></td>
+        <td>89</td>
+    </tr>
+    <tr>
+        <td>70</td>
+        <td><b>A6</b></td>
+        <td><b>B6</b></td>
+        <td><b>C6</b></td>
+        <td><b>D6</b></td>
+        <td><b>E6</b></td>
+        <td><b>F6</b></td>
+        <td><b>G6</b></td>
+        <td><b>H6</b></td>
+        <td>79</td>
+    </tr>
+    <tr>
+        <td>60</td>
+        <td><b>A5</b></td>
+        <td><b>B5</b></td>
+        <td><b>C5</b></td>
+        <td><b>D5</b></td>
+        <td><b>E5</b></td>
+        <td><b>F5</b></td>
+        <td><b>G5</b></td>
+        <td><b>H5</b></td>
+        <td>69</td>
+    </tr>
+    <tr>
+        <td>50</td>
+        <td><b>A4</b></td>
+        <td><b>B4</b></td>
+        <td><b>C4</b></td>
+        <td><b>D4</b></td>
+        <td><b>E4</b></td>
+        <td><b>F4</b></td>
+        <td><b>G4</b></td>
+        <td><b>H4</b></td>
+        <td>59</td>
+    </tr>
+    <tr>
+        <td>40</td>
+        <td><b>A3</b></td>
+        <td><b>B3</b></td>
+        <td><b>C3</b></td>
+        <td><b>D3</b></td>
+        <td><b>E3</b></td>
+        <td><b>F3</b></td>
+        <td><b>G3</b></td>
+        <td><b>H3</b></td>
+        <td>49</td>
+    </tr>
+    <tr>
+        <td>30</td>
+        <td><b>A2</b></td>
+        <td><b>B2</b></td>
+        <td><b>C2</b></td>
+        <td><b>D2</b></td>
+        <td><b>E2</b></td>
+        <td><b>F2</b></td>
+        <td><b>G2</b></td>
+        <td><b>H2</b></td>
+        <td>39</td>
+    </tr>
+    <tr>
+        <td>20</td>
+        <td><b>A1</b></td>
+        <td><b>B1</b></td>
+        <td><b>C1</b></td>
+        <td><b>D1</b></td>
+        <td><b>E1</b></td>
+        <td><b>F1</b></td>
+        <td><b>G1</b></td>
+        <td><b>H1</b></td>
+        <td>29</td>
+    </tr>
+    <tr>
+        <td>10</td>
+        <td>11</td>
+        <td>12</td>
+        <td>13</td>
+        <td>14</td>
+        <td>15</td>
+        <td>16</td>
+        <td>17</td>
+        <td>18</td>
+        <td>19</td>
+    </tr>
+    <tr>
+        <td>0</td>
+        <td>1</td>
+        <td>2</td>
+        <td>3</td>
+        <td>4</td>
+        <td>5</td>
+        <td>6</td>
+        <td>7</td>
+        <td>8</td>
+        <td>9</td>
+    </tr>
+</table>
+<p/>
+When testing whether a move is legal, it is enough to test if the target square
+is empty or contains an enemy piece. It is not even necessary to exlicitly test
+for invalid squares.
+<p/>
+An enumeration is used to define the index of each square. This enumeration is
+defined in the file <em>CSquare.h</em>. This is purely for code readability,
+i.e. if I refer to a square as E2 it is more readable, than using the integer
+35.
+<pre>
+enum // Squares
+{
+    A8 = 91, B8, C8, D8, E8, F8, G8, H8,
+    A7 = 81, B7, C7, D7, E7, F7, G7, H7,
+    A6 = 71, B6, C6, D6, E6, F6, G6, H6,
+    A5 = 61, B5, C5, D5, E5, F5, G5, H5,
+    A4 = 51, B4, C4, D4, E4, F4, G4, H4,
+    A3 = 41, B3, C3, D3, E3, F3, G3, H3,
+    A2 = 31, B2, C2, D2, E2, F2, G2, H2,
+    A1 = 21, B1, C1, D1, E1, F1, G1, H1,
+};
+</pre>
+
+<h2>The CSquare class</h2>
+It does become necessary to determine the row and/or column number of a given
+square, for instance when checking for pawn promotion.  Therefore I've chosen
+to write a class <em>CSquare</em> to handle this.  The following is the
+essential ingredients:
+<pre>
+class CSquare 
+{
+    public: 
+        int row() const {return (m_sq/10) - 1;} // returns 1 - 8
+        int col() const {return (m_sq%10);}     // returns 1 - 8
+
+    private:
+        uint8_t  m_sq; // Internal representation, 0 - 119.
+}; // end of class CSquare
+</pre>
+
+<h1>Move representation</h1>
+The next to consider is how to represent a board. Obviously, we need an
+originating square, and a target square. However, this is not quite enough.
+When a pawn reaches the back rank, it may promote to any other piece, and this
+must be given as well.
+<h2>The CMove class</h2>
+The class CMove is used to represent a single chess move.  The essential
+ingredients in this class are:
+<pre>
+class CMove
+{
+    public:
+        CSquare     From(void) const {return m_from;}
+        CSquare     To(void) const {return m_to;}
+
+    private:
+        CSquare     m_from;
+        CSquare     m_to;
+        int8_t      m_promoted; // This handles pawn promotion.
+}; // end of CMove
+</pre>
+<p/>
+Note the member variable <em>m_promoted</em>. This is only used during pawn
+promotion, where it contains the piece that the pawn promotes to. In case of an
+ordinary move, the variable is not used, and should be set to zero (empty).
+<h2>The CMoveList class</h2>
+When generating a list of all the legal moves in a chess position, it becomes necessary to
+manipulate lists of moves. I've found it convenient to write a separate class just for this:
+<pre>
+class CMoveList
+{
+    public:
+        void clear()
+        {
+            m_moveList.clear();
+        }
+
+        void push_back(const CMove& move)
+        {
+            m_moveList.push_back(move);
+        }
+
+        unsigned int size() const
+        {
+            return m_moveList.size();
+        }
+
+        const CMove & operator [] (unsigned int ix) const { return m_moveList[ix]; }
+
+    private:
+        std::vector<CMove> m_moveList;
+
+}; // end of CMoveList
+</pre>
+<p/>
+The purpose of this class is just to encapsulate the semantics of an ordinary
+array. Here I've chosen to implement the array using the <em>std::vector</em>
+container class.
+<p/>
+When populating the list, the functions <em>clear()</em> and <em>push_back(move)</em> are used.
+When examining the list, the functions <em>size()</em> and <em>operator []</em> are used.
+
+<h1>Board representation</h1>
+<h2>The CBoard class</h2>
+This class is defined in the file <em>CBoard.h</em> and contains all the
+information defining the current position on the board. Of course, this
+includes the above mentioned array.  Additionally, it includes an additional
+integer value that specifies whether it is the white or the black pieces to
+move.
+<pre>
+class CBoard
+{
+    public:
+        void newGame();
+        void find_legal_moves(CMoveList &moves) const;
+
+    private:
+        std::vector<int8_t>   m_board;
+        int m_side_to_move;
+}; // end of class CBoard
+</pre>
+
+</body>
+
+</html>

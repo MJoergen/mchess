@@ -259,14 +259,17 @@ class CSquare
     public: 
         int row() const {return (m_sq/10) - 1;} // returns 1 - 8
         int col() const {return (m_sq%10);}     // returns 1 - 8
+        operator int() const { return m_sq; }   // Implicit conversion to integer
 
     private:
         uint8_t  m_sq; // Internal representation, 0 - 119.
 }; // end of class CSquare
 </pre>
+The conversion operator <em>int()</em> allows the CSquare class to be used
+directly as an array index.
 
 <h1>Move representation</h1>
-The next to consider is how to represent a board. Obviously, we need an
+The next to consider is how to represent a move. Obviously, we need an
 originating square, and a target square. However, this is not quite enough.
 When a pawn reaches the back rank, it may promote to any other piece, and this
 must be given as well.
@@ -290,6 +293,18 @@ class CMove
 Note the member variable <em>m_promoted</em>. This is only used during pawn
 promotion, where it contains the piece that the pawn promotes to. In case of an
 ordinary move, the variable is not used, and should be set to zero (empty).
+<h2>Enhancements</h2>
+
+This class contains two additional private member variables:
+<pre>
+        int8_t      m_piece;
+        int8_t      m_captured;
+</pre>
+The first, <em>m_piece</em>, contains the current piece being moved, the second
+variable, <em>m_captured</em>, contains the piece being captured, if any.  They
+are both used only for printing the current move to the user.
+
+
 <h2>The CMoveList class</h2>
 When generating a list of all the legal moves in a chess position, it becomes necessary to
 manipulate lists of moves. I've found it convenient to write a separate class just for this:
@@ -331,21 +346,67 @@ When examining the list, the functions <em>size()</em> and <em>operator []</em> 
 <h2>The CBoard class</h2>
 This class is defined in the file <em>CBoard.h</em> and contains all the
 information defining the current position on the board. Of course, this
-includes the above mentioned array.  Additionally, it includes an additional
-integer value that specifies whether it is the white or the black pieces to
-move.
+includes the above mentioned array.  Additionally, it includes an integer value
+that specifies whether it is the white or the black pieces to move.
 <pre>
 class CBoard
 {
     public:
         void newGame();
         void find_legal_moves(CMoveList &moves) const;
+        void make_move(const CMove &move);
+        int  get_value();
 
     private:
         std::vector<int8_t>   m_board;
         int m_side_to_move;
 }; // end of class CBoard
 </pre>
+<p/>
+The function <em>newGame()</em> resets the board to the starting position, the
+function <em>make_move()</em> updates the board position with the supplied
+move, and finally <em>find_legal_moves()</em> generates a list of all legal moves
+in the current board position.
+<h2>Enhancements</h2>
+To improve performance, I've added another member variable that keeps track of
+the current material balance.
+<pre>
+        int m_material;
+</pre>
+This is kind of like a cache. Instead of
+calculating the material balance after each move, it is much faster to check
+for captures and promotion, and adjust the current cache incrementally.
+
+<h1>Searching for the best move</h1>
+<h2>The AI class</h2>
+This class contains an implementation of the alpha-beta pruning algorithm.
+This is a complicated function, and is best described in <a
+href="http://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning">wikipedia</a>
+and the <a href="http://chessprogramming.wikispaces.com/Alpha-Beta">chess
+programming</a> site.
+
+The class interface is very simple, however:
+<pre>
+class AI
+{
+    public:
+        AI(CBoard& board) : m_board(board) { }
+
+        CMove find_best_move();
+
+    private:
+        int search(int alpha, int beta, int level);
+
+        CBoard&         m_board;
+}; // end of class AI
+</pre>
+Note that the <em>m_board</em> variable is a reference. This is to avoid making copies of the entire <em>CBoard</em> class.
+
+<h1>Final remarks</h1>
+These are the basic ingredients necessary to make a working chess engine.
+There only remains to write a <em>main()</em> function that instantiates a
+<em>CBoard</em> and a <em>AI</em> object. The you must read the user input and
+call <em>ai.find_best_move()</em>.
 
 </body>
 

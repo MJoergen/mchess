@@ -18,7 +18,8 @@ Features
 Documentation
 =============
 
-The design is documented in the file DOC.html
+The design is documented in the file DOC.html.
+
 The source code has comments in most places.  Otherwise, the best place for a high level description is the
 above link.
 Additionally, the directory doc contains some additional information on writing chess engines.

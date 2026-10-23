@@ -1,5 +1,5 @@
-#ifndef _AI_H_
-#define _AI_H_
+#ifndef AI_H_
+#define AI_H_
 
 #include "CBoard.h"
 
@@ -12,9 +12,10 @@ class AI
 
     private:
         int search(int alpha, int beta, int level);
+        int quiescence(int alpha, int beta);
 
         CBoard&         m_board;
 }; // end of class AI
 
-#endif // _AI_H_
+#endif // AI_H_
 

@@ -1,5 +1,7 @@
-#ifndef _C_MOVE_H_
-#define _C_MOVE_H_
+#ifndef C_MOVE_H_
+#define C_MOVE_H_
+
+#include <string>
 
 #include "CSquare.h"
 
@@ -32,9 +34,9 @@ class CMove
         friend std::ostream& operator <<(std::ostream &os, const CMove &rhs);
 
         // Constructors
-        CMove() : m_piece(IV), m_captured(IV) {}
+        CMove() : m_piece(IV), m_captured(IV), m_promoted(EM) {}
 
-        CMove(const char *str) : m_captured(IV) { FromString(str); }
+        CMove(const char *str) : m_piece(IV), m_captured(IV), m_promoted(EM) { FromString(str); }
 
         CMove(int8_t piece, const CSquare& from, const CSquare& to, int8_t captured = EM, int8_t promoted=EM) :
             m_from(from), m_to(to), m_piece(piece), m_captured(captured), m_promoted(promoted) {}
@@ -49,7 +51,6 @@ class CMove
         CSquare     From(void) const {return m_from;}
         CSquare     To(void) const {return m_to;}
         bool        Valid(void) const { return m_captured != IV; } 
-        bool        is_captured_piece_a_king(void) const { return (m_captured == WK || m_captured == BK); } 
         bool        is_it_a_capture(void) const { return (m_captured != EM); } 
         bool        operator==(const CMove& rhs) const
         {
@@ -57,7 +58,7 @@ class CMove
                 return false;
             if (rhs.To() != To())
                 return false;
-            return true;
+            return rhs.m_promoted == m_promoted;
         }
 
     private:
@@ -69,5 +70,5 @@ class CMove
 
 }; /* end of CMove */
 
-#endif // _C_MOVE_H_
+#endif // C_MOVE_H_
 

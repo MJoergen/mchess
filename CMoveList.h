@@ -1,5 +1,5 @@
-#ifndef _C_MOVELIST_H_
-#define _C_MOVELIST_H_
+#ifndef C_MOVELIST_H_
+#define C_MOVELIST_H_
 
 #include <iostream>
 #include <vector>
@@ -47,5 +47,5 @@ class CMoveList
 
 }; /* end of CMoveList */
 
-#endif // _C_MOVELIST_H_
+#endif // C_MOVELIST_H_
 

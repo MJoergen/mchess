@@ -25,9 +25,10 @@ else
   program := $(program).exe
 endif
 
+.PHONY: install clean
+
 $(program): $(objects) Makefile
 	$(CC) -o $@ $(objects) $(OPTIONS)
-	cp $@ $(HOME)/bin
 
 %.d: %.cc Makefile
 	set -e; $(CC) -M $(CPPFLAGS) $(DEFINES) $(INCLUDE_DIRS) $< \
@@ -38,6 +39,10 @@ include $(depends)
 
 %.o : %.cc Makefile
 	$(CC) $(OPTIONS) $(DEFINES) $(INCLUDE_DIRS) -c $< -o $@
+
+install: $(program)
+	mkdir -p $(HOME)/bin
+	cp $(program) $(HOME)/bin
 
 clean:
 	-rm -f $(objects)

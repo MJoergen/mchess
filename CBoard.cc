@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdlib.h> // abs()
 #include "CBoard.h"
 
 // Create nice colours in the console output
@@ -71,11 +72,7 @@ void CBoard::newGame()
         IV, IV, IV, IV, IV, IV, IV, IV, IV, IV,
         IV, IV, IV, IV, IV, IV, IV, IV, IV, IV} ;
 
-    m_board.reserve(120);
-    for (int i=0; i<120; ++i)
-    {
-        m_board[i] = initial[i];
-    }
+    m_board.assign(initial, initial + 120);
 
     m_side_to_move = 1;
     m_material = 0;
@@ -83,11 +80,11 @@ void CBoard::newGame()
 
 /***************************************************************
  * isSquareThreatened
- * Returns true if OTHER side to move threatens this square
+ * Returns true if the side opposite to "side" threatens this square
  ***************************************************************/
-bool CBoard::isSquareThreatened(const CSquare& sq) const
+bool CBoard::isSquareThreatened(const CSquare& sq, int side) const
 {
-    if (m_side_to_move > 0)
+    if (side > 0)
     {
         // Check for pawns
         if (m_board[sq + NW] == BP || m_board[sq + NE] == BP)
@@ -232,12 +229,12 @@ bool CBoard::isSquareThreatened(const CSquare& sq) const
 } // end of isSquareThreatened
 
 /***************************************************************
- * find_legal_moves
+ * find_pseudo_legal_moves
  * This generates a complete list of all pseudo-legal moves.
  * A pseudo-legal move does not consider, whether the king will
- * be in check. This is handled else-where.
+ * be in check. See find_legal_moves for that.
  ***************************************************************/
-void CBoard::find_legal_moves(CMoveList &moves) const
+void CBoard::find_pseudo_legal_moves(CMoveList &moves) const
 {
     moves.clear();
 
@@ -710,7 +707,29 @@ void CBoard::find_legal_moves(CMoveList &moves) const
             }
 
         }
-} // end of void CBoard::find_legal_moves(CMoveList &moves) const;
+} // end of void CBoard::find_pseudo_legal_moves(CMoveList &moves) const;
+
+
+/***************************************************************
+ * find_legal_moves
+ * This generates the list of all legal moves, i.e. the
+ * pseudo-legal moves that do not leave our own king in check.
+ ***************************************************************/
+void CBoard::find_legal_moves(CMoveList &moves)
+{
+    CMoveList pseudo;
+    find_pseudo_legal_moves(pseudo);
+
+    moves.clear();
+    for (unsigned int i=0; i<pseudo.size(); ++i)
+    {
+        make_move(pseudo[i]);
+        bool illegal = isOtherKingInCheck();
+        undo_move(pseudo[i]);
+        if (!illegal)
+            moves.push_back(pseudo[i]);
+    }
+} // end of void CBoard::find_legal_moves(CMoveList &moves)
 
 
 /***************************************************************
@@ -782,18 +801,28 @@ void CBoard::undo_move(const CMove &move)
 
 /***************************************************************
  * IsMoveValid
- * This returns true, if the move is legal.
+ * This returns true, if the move is legal. In that case the move
+ * is replaced by the corresponding generated move, so it is fully
+ * filled in (piece, captured piece, promotion).
+ * If no promotion piece is given, a queen is assumed.
  ***************************************************************/
-bool CBoard::IsMoveValid(CMove &move) const
+bool CBoard::IsMoveValid(CMove &move)
 {
     CMoveList moves;
     find_legal_moves(moves);
     for (unsigned int i=0; i<moves.size(); ++i)
     {
-        if (moves[i] == move)
+        const CMove& m = moves[i];
+        if (m.From() != move.From() || m.To() != move.To())
+            continue;
+
+        int wanted = move.m_promoted;
+        if (wanted == EM && m.m_promoted != EM)
+            wanted = WQ;
+
+        if (abs(m.m_promoted) == wanted)
         {
-            move.m_piece = m_board[move.m_from];
-            move.m_captured = m_board[move.m_to];
+            move = m;
             return true;
         }
     }
@@ -823,11 +852,11 @@ bool CBoard::IsMoveValid(CMove &move) const
 int CBoard::get_value()
 {
     CMoveList moves;
-    find_legal_moves(moves);
+    find_pseudo_legal_moves(moves);
     int my_moves = moves.size();
     swap_sides();
 
-    find_legal_moves(moves);
+    find_pseudo_legal_moves(moves);
     int his_moves = moves.size();
     swap_sides();
 
@@ -836,19 +865,14 @@ int CBoard::get_value()
 
 
 /***************************************************************
- * Returns true if player to move is in check.
+ * Returns true if the king of the given side is in check.
  ***************************************************************/
-bool CBoard::isKingInCheck() const
+bool CBoard::isKingInCheckFor(int side) const
 {
-    e_piece king;
+    e_piece king = (side == 1) ? WK : BK;
     CSquare kingSquare = 0;
 
-    if (m_side_to_move == 1)
-        king = WK;
-    else
-        king = BK;
-
-    // Look for our king
+    // Look for the king
     for (int i=A1; i<=H8; ++i)
     {
         if (m_board[i] == king)
@@ -860,8 +884,16 @@ bool CBoard::isKingInCheck() const
 
     assert (kingSquare != 0); // The king MUST be somewhere
 
-    return isSquareThreatened(kingSquare);
+    return isSquareThreatened(kingSquare, side);
+} // end of isKingInCheckFor
 
+
+/***************************************************************
+ * Returns true if player to move is in check.
+ ***************************************************************/
+bool CBoard::isKingInCheck() const
+{
+    return isKingInCheckFor(m_side_to_move);
 } // end of isKingInCheck
 
 
@@ -870,9 +902,5 @@ bool CBoard::isKingInCheck() const
  ***************************************************************/
 bool CBoard::isOtherKingInCheck() const
 {
-    ((CBoard *)this)->m_side_to_move = -m_side_to_move;
-    bool retval = isKingInCheck();
-    ((CBoard *)this)->m_side_to_move = -m_side_to_move;
-    return retval;
+    return isKingInCheckFor(-m_side_to_move);
 } // end of isOtherKingInCheck
-

@@ -12,7 +12,9 @@ Features
 ========
 
 - Includes a simple alpha-beta search strategy.
-- Searches a fixed depth of four ply.
+- Detects check-mate and stale-mate.
+- A `perft N` command for testing the move generator.
+- Searches a fixed depth of five ply (the root move plus four), followed by a capture-only quiescence search.
 - A simple console (ASCII) user interface.
 
 Documentation

@@ -353,7 +353,8 @@ class CBoard
 {
     public:
         void newGame();
-        void find_legal_moves(CMoveList &moves) const;
+        void find_pseudo_legal_moves(CMoveList &moves) const;
+        void find_legal_moves(CMoveList &moves);
         void make_move(const CMove &move);
         int  get_value();
 
@@ -365,7 +366,7 @@ class CBoard
 <p/>
 The function <em>newGame()</em> resets the board to the starting position, the
 function <em>make_move()</em> updates the board position with the supplied
-move, and finally <em>find_legal_moves()</em> generates a list of all legal moves
+move, and finally <em>find_legal_moves()</em> generates a list of all legal moves (built on <em>find_pseudo_legal_moves()</em>, which ignores whether the king is left in check)
 in the current board position.
 <h2>Enhancements</h2>
 To improve performance, I've added another member variable that keeps track of

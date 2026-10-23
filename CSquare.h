@@ -1,5 +1,5 @@
-#ifndef _C_SQUARE_H_
-#define _C_SQUARE_H_
+#ifndef C_SQUARE_H_
+#define C_SQUARE_H_
 
 #include <stdint.h>
 #include <iostream>
@@ -56,5 +56,5 @@ class CSquare
         uint8_t  m_sq; // Internal representation, 0 - 119.
 }; /* end of class CSquare */
 
-#endif // _C_SQUARE_H_
+#endif // C_SQUARE_H_
 

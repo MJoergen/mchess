@@ -1,4 +1,5 @@
 #include <sstream>
+#include <cctype>
 #include <assert.h>
 
 #include "CMove.h"
@@ -48,8 +49,16 @@ std::string CMove::ToLongString() const
 }
 
 // Returns NULL if error
+// The optional promotion suffix (q, r, b or n) is stored as a white piece
+// type here. CBoard::IsMoveValid replaces the whole move with the matching
+// generated move, which has the correct colour.
 const char * CMove::FromString(const char *s)
 { 
+    // Make sure we never read beyond the terminating zero
+    for (int i=0; i<4; ++i)
+        if (s[i] == '\0')
+            return NULL;
+
     if (m_from.FromString(s) || m_to.FromString(s+2))
         return NULL;
 
@@ -59,31 +68,15 @@ const char * CMove::FromString(const char *s)
     m_captured = EM;
     m_promoted = EM;
 
-    if (m_to.row() == 1)
+    switch (tolower(s[0]))
     {
-        switch (tolower(s[0]))
-        {
-            case 'q' : m_promoted = BQ; s++; break;
-            case 'r' : m_promoted = BR; s++; break;
-            case 'b' : m_promoted = BB; s++; break;
-            case 'n' : m_promoted = BN; s++; break;
-            case ' ' : break;
-            case '\0': break;
-            default  : return NULL;
-        }
-    }
-    else if (m_to.row() == 8)
-    {
-        switch (tolower(s[0]))
-        {
-            case 'q' : m_promoted = WQ; s++; break;
-            case 'r' : m_promoted = WR; s++; break;
-            case 'b' : m_promoted = WB; s++; break;
-            case 'n' : m_promoted = WN; s++; break;
-            case ' ' : break;
-            case '\0': break;
-            default  : return NULL;
-        }
+        case 'q' : m_promoted = WQ; s++; break;
+        case 'r' : m_promoted = WR; s++; break;
+        case 'b' : m_promoted = WB; s++; break;
+        case 'n' : m_promoted = WN; s++; break;
+        case ' ' : break;
+        case '\0': break;
+        default  : return NULL;
     }
 
     while (s[0] == ' ')
@@ -91,4 +84,3 @@ const char * CMove::FromString(const char *s)
 
     return s;
 } /* end of FromString */
-
